@@ -8,8 +8,15 @@
         DataContext="{Binding Source={StaticResource Locator},Path=MainWindow}"
         d:DataContext="{Binding Source={StaticResource Locator},Path=MainWindow}"
         mc:Ignorable="d"
-        Title="{Binding AppName}" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+        Title="{Binding AppName}" Height="600" Width="800">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="文件">
+                <MenuItem Header="导入" Command="{Binding ImportDataCommand}"/>
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <DataGrid ItemsSource="{Binding Data}" AutoGenerateColumns="True" IsReadOnly="True" Margin="5"/>
+        </Grid>
+    </DockPanel>
 </Window>

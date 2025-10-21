@@ -1,4 +1,4 @@
-﻿<Window x:Class="VisualApp.MainWindow"
+﻿<Window x:Class="VisualApp.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -19,8 +19,11 @@
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="文件">
+            <MenuItem Header="数据">
                 <MenuItem Header="导入" Command="{Binding ImportDataCommand}"/>
+            </MenuItem>
+            <MenuItem Header="作图">
+                <MenuItem Header="折线图" Command="{Binding AddPlotTabCommand}" CommandParameter="Line"/>
             </MenuItem>
         </Menu>
         <Grid>

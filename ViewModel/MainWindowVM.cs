@@ -10,38 +10,39 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using VisualApp.Parsers;
+using VisualApp.Services;
 
 namespace VisualApp.ViewModel
 {
     public partial class MainWindowVM : BaseVM
     {
+        private readonly DataService _dataService;
+
         public string AppName => $"MeasureApp {Assembly.GetEntryAssembly()?.GetName().Version}";
 
         [ObservableProperty]
         private ObservableCollection<TabVMBase> tabItems;
 
-        public MainWindowVM()
+        public IRelayCommand ImportDataCommand => _dataService.ImportDataCommand;
+
+        public MainWindowVM(DataService ds, DataPreviewTabVM dpTab)
         {
+            _dataService = ds;
+
             TabItems = new();
-            TabItems.Add(new DataPreviewTabVM());
+            TabItems.Add(dpTab);
         }
 
         [RelayCommand]
-        private void ImportData()
+        public void AddPlotTab(string parameter)
         {
-            try
+            switch (parameter)
             {
-                //OpenFileDialog ofd = new OpenFileDialog();
-                //if (ofd.ShowDialog() == true)
-                //{
-                //    string filePath = ofd.FileName;
-                //    Data = ParserRouter.ParseFile(filePath);
-                //}
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
+                case "Line":
+
+                    break;
             }
         }
     }

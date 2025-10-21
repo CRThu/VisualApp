@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VisualApp.Services;
 
 namespace VisualApp.ViewModel
 {
@@ -15,6 +16,11 @@ namespace VisualApp.ViewModel
         {
             container = new Container();
 
+            // Services
+            container.Register<DataService>(Reuse.Singleton);
+            
+            // VMs
+            container.Register<DataPreviewTabVM>();
             container.Register<MainWindowVM>(Reuse.Singleton);
         }
 

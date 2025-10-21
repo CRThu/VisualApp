@@ -4,11 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VisualApp"
+        xmlns:v="clr-namespace:VisualApp.View"
+        xmlns:vm="clr-namespace:VisualApp.ViewModel"
         xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:ikriv="clr-namespace:IKriv.Windows.Controls.Behaviors"
         DataContext="{Binding Source={StaticResource Locator},Path=MainWindow}"
         d:DataContext="{Binding Source={StaticResource Locator},Path=MainWindow}"
         mc:Ignorable="d"
         Title="{Binding AppName}" Height="600" Width="800">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:DataPreviewTabVM}">
+            <v:DataPreviewView/>
+        </DataTemplate>
+    </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="文件">
@@ -16,7 +24,20 @@
             </MenuItem>
         </Menu>
         <Grid>
-            <DataGrid ItemsSource="{Binding Data}" AutoGenerateColumns="True" IsReadOnly="True" Margin="5"/>
+            <hc:TabControl ItemsSource="{Binding TabItems}" ikriv:TabContent.IsCached="True" Margin="5">
+                <hc:TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Title}" Padding="5"/>
+                    </DataTemplate>
+                </hc:TabControl.ItemTemplate>
+                <ikriv:TabContent.Template>
+                    <DataTemplate>
+                        <Grid>
+                            <ContentControl Content="{Binding}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ikriv:TabContent.Template>
+            </hc:TabControl>
         </Grid>
     </DockPanel>
 </Window>

@@ -18,9 +18,10 @@ namespace VisualApp.ViewModel
 
             // Services
             container.Register<DataService>(Reuse.Singleton);
-            
+
             // VMs
             container.Register<DataPreviewTabVM>();
+            container.Register<DataPlotTabVM>();
             container.Register<MainWindowVM>(Reuse.Singleton);
         }
 

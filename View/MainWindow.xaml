@@ -16,28 +16,32 @@
         <DataTemplate DataType="{x:Type vm:DataPreviewTabVM}">
             <v:DataPreviewView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DataPlotTabVM}">
+            <v:DataPlotView/>
+        </DataTemplate>
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="数据">
+            <MenuItem Header="文件">
                 <MenuItem Header="导入" Command="{Binding ImportDataCommand}"/>
             </MenuItem>
-            <MenuItem Header="作图">
+            <MenuItem Header="视图">
                 <MenuItem Header="折线图" Command="{Binding AddPlotTabCommand}" CommandParameter="Line"/>
             </MenuItem>
         </Menu>
         <Grid>
-            <hc:TabControl ItemsSource="{Binding TabItems}" ikriv:TabContent.IsCached="True" Margin="5">
+            <hc:TabControl ItemsSource="{Binding TabItems}" ikriv:TabContent.IsCached="True" Margin="5" IsAnimationEnabled="True" IsDraggable="True" OverflowMenuDisplayMemberPath="Title">
                 <hc:TabControl.ItemTemplate>
                     <DataTemplate>
+                        <!--<hc:SimpleStackPanel Orientation="Horizontal">-->
                         <TextBlock Text="{Binding Title}" Padding="5"/>
+                        <!--<Button Content="X" Style="{StaticResource ButtonDashed.Small}"/>-->
+                        <!--</hc:SimpleStackPanel>-->
                     </DataTemplate>
                 </hc:TabControl.ItemTemplate>
                 <ikriv:TabContent.Template>
                     <DataTemplate>
-                        <Grid>
-                            <ContentControl Content="{Binding}"/>
-                        </Grid>
+                        <ContentControl Content="{Binding}"/>
                     </DataTemplate>
                 </ikriv:TabContent.Template>
             </hc:TabControl>

@@ -9,8 +9,12 @@
              d:DataContext="{d:DesignInstance Type=vm:DataPreviewTabVM}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <hc:SimpleStackPanel>
-        <TextBlock Text="DataPreviewView"/>
-        <DataGrid ItemsSource="{Binding PreviewData}" AutoGenerateColumns="True" IsReadOnly="True" Margin="5" Style="{StaticResource DataGrid.Small}"/>
-    </hc:SimpleStackPanel>
+    <Grid>
+        <hc:ScrollViewer IsInertiaEnabled="True" hc:ScrollViewerAttach.AutoHide="False">
+            <hc:SimpleStackPanel>
+                <TextBlock Text="DataPreviewView"/>
+                <DataGrid ItemsSource="{Binding PreviewData}" AutoGenerateColumns="True" IsReadOnly="True" Margin="5" Style="{StaticResource DataGrid.Small}"/>
+            </hc:SimpleStackPanel>
+        </hc:ScrollViewer>
+    </Grid>
 </UserControl>

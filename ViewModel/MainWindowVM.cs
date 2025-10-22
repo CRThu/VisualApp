@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,17 +20,19 @@ namespace VisualApp.ViewModel
     public partial class MainWindowVM : BaseVM
     {
         private readonly DataService _dataService;
+        private readonly Func<SeriesType, string, DataPlotTabVM> _plotFactory;
 
-        public string AppName => $"MeasureApp {Assembly.GetEntryAssembly()?.GetName().Version}";
+        public string AppName => $"VisualApp {Assembly.GetEntryAssembly()?.GetName().Version}";
 
         [ObservableProperty]
         private ObservableCollection<TabVMBase> tabItems;
 
         public IRelayCommand ImportDataCommand => _dataService.ImportDataCommand;
 
-        public MainWindowVM(DataService ds, DataPreviewTabVM dpTab)
+        public MainWindowVM(DataService ds, DataPreviewTabVM dpTab, Func<SeriesType, string, DataPlotTabVM> plotFactory)
         {
             _dataService = ds;
+            _plotFactory = plotFactory;
 
             TabItems = new();
             TabItems.Add(dpTab);
@@ -41,7 +44,7 @@ namespace VisualApp.ViewModel
             switch (parameter)
             {
                 case "Line":
-
+                    TabItems.Add(_plotFactory(SeriesType.Line,"折线图"));
                     break;
             }
         }

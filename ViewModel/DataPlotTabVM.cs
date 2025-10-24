@@ -52,6 +52,7 @@ namespace VisualApp.ViewModel
             Title = header;
             _dataService = ds;
             _type = type;
+            plot = new();
 
             DataKeys = new();
 
@@ -89,7 +90,7 @@ namespace VisualApp.ViewModel
         {
             try
             {
-                Plot = new Plot();
+                Plot.Clear();
 
                 DateTime[] dts = null;
                 double[] xs = null;

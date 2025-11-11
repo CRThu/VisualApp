@@ -45,6 +45,9 @@ namespace VisualApp.ViewModel
         private string selectedYDataKey;
 
         [ObservableProperty]
+        private string renderStatusText;
+
+        [ObservableProperty]
         private Plot plot;
 
         public DataPlotTabVM(DataService ds, SeriesType type, string header)
@@ -90,62 +93,157 @@ namespace VisualApp.ViewModel
         {
             try
             {
+                RenderStatusText = "绘图状态: 成功";
                 Plot.Clear();
 
-                DateTime[] dts = null;
-                double[] xs = null;
-                double[] ys = null;
-
-
-                if (IsXDataDateTime)
+                // 检查数据和选择的列
+                if (_dataService.Data == null || _dataService.Data.Rows.Count == 0)
                 {
-                    string[] ss = new string[]
+                    RenderStatusText = "绘图错误: 数据容器为空";
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(SelectedYDataKey))
+                {
+                    RenderStatusText = "绘图错误: 数据y轴键名为空";
+                    return;
+                }
+
+                // 获取 Y 轴数据
+                double[] ys = GetNumericData(SelectedYDataKey);
+                if (ys == null || ys.Length == 0)
+                {
+                    RenderStatusText = "绘图错误: 数据y轴数据为空";
+                    return;
+                }
+
+                double[] xs = null;
+                DateTime[] dts = null;
+                bool useDateTime = false;
+                string xLabel = "索引";
+
+                // 尝试获取 X 轴数据（自动降级）
+                if (IsXDataEnabled && !string.IsNullOrEmpty(SelectedXDataKey))
+                {
+                    if (IsXDataDateTime)
                     {
-                            "2025-10-21 01:11:00",
-                            "2025-10-22 02:22:00",
-                            "2025-10-23 03:33:00",
-                            "2025-10-24 04:44:00",
-                            "2025-10-25 05:55:00",
-                            "2025-10-26 06:00:00"
-                    };
-                    dts = ss.Select(s => DateTimeParser.Parse(s)).ToArray();
+                        // 尝试日期时间
+                        dts = GetDateTimeData(SelectedXDataKey);
+                        if (dts != null && dts.Length > 0)
+                        {
+                            useDateTime = true;
+                            xLabel = SelectedXDataKey;
+                        }
+                        else
+                        {
+                            // 日期解析失败，降级为数值
+                            RenderStatusText = "绘图错误: X轴日期解析失败，降级为数值";
+                            xs = GetNumericData(SelectedXDataKey);
+                            if (xs != null && xs.Length > 0)
+                            {
+                                xLabel = SelectedXDataKey;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // 尝试数值
+                        xs = GetNumericData(SelectedXDataKey);
+                        if (xs != null && xs.Length > 0)
+                        {
+                            xLabel = SelectedXDataKey;
+                        }
+                    }
+                }
 
-                    ys = Generate.RandomWalk(dts.Length);
+                // 如果 X 轴数据获取失败，降级为索引
+                RenderStatusText = "绘图错误: X轴数据解析失败，降级为数值";
+                if (!useDateTime && (xs == null || xs.Length == 0))
+                {
+                    xs = Enumerable.Range(0, ys.Length).Select(i => (double)i).ToArray();
+                    xLabel = "索引";
+                }
 
+                // 绘制图表
+                if (useDateTime)
+                {
+                    // 确保数据长度一致
+                    int minLength = Math.Min(dts.Length, ys.Length);
+                    Array.Resize(ref dts, minLength);
+                    Array.Resize(ref ys, minLength);
 
                     Plot.Add.Scatter(dts, ys);
-
-                    // setup the bottom axis to use DateTime ticks
                     Plot.Axes.Remove(Edge.Bottom);
-                    var axis = Plot.Axes.DateTimeTicksBottom();
+                    Plot.Axes.DateTimeTicksBottom();
                 }
                 else
                 {
-                    xs = new double[] { 1, 2, 3, 4, 5 };
-                    ys = Generate.RandomWalk(xs.Length);
-
-                    Plot.Axes.Remove(Edge.Bottom);
-                    var axis = Plot.Axes.NumericTicksBottom();
+                    // 确保数据长度一致
+                    int minLength = Math.Min(xs.Length, ys.Length);
+                    Array.Resize(ref xs, minLength);
+                    Array.Resize(ref ys, minLength);
 
                     Plot.Add.Scatter(xs, ys);
+                    Plot.Axes.Remove(Edge.Bottom);
+                    Plot.Axes.NumericTicksBottom();
                 }
 
-                Plot.Axes.Bottom.Label.Text = SelectedXDataKey;
+                Plot.Axes.Bottom.Label.Text = xLabel;
                 Plot.Axes.Left.Label.Text = SelectedYDataKey;
                 Plot.Legend.IsVisible = true;
-
                 Plot.Axes.AntiAlias(true);
-
                 Plot.Axes.AutoScale();
                 Plot.ScaleFactor = 1.5;
+                Plot.Font.Automatic();
 
                 WeakReferenceMessenger.Default.Send(PlotResetMessage.Instance);
-                //Plot.SavePng("demo.png", 400, 300);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"{ex}");
+                MessageBox.Show($"绘图错误: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// 从 DataTable 中获取数值数据
+        /// </summary>
+        private double[] GetNumericData(string columnName)
+        {
+            if (_dataService.Data == null || !_dataService.Data.Columns.Contains(columnName))
+                return null;
+
+            List<double> result = new List<double>();
+            foreach (DataRow row in _dataService.Data.Rows)
+            {
+                string value = row[columnName]?.ToString();
+                if (!string.IsNullOrWhiteSpace(value) && double.TryParse(value, out double d))
+                {
+                    result.Add(d);
+                }
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// 从 DataTable 中获取日期时间数据
+        /// </summary>
+        private DateTime[] GetDateTimeData(string columnName)
+        {
+            if (_dataService.Data == null || !_dataService.Data.Columns.Contains(columnName))
+                return null;
+
+            List<DateTime> result = new List<DateTime>();
+            foreach (DataRow row in _dataService.Data.Rows)
+            {
+                string value = row[columnName]?.ToString();
+                if (!string.IsNullOrWhiteSpace(value) && DateTimeParser.TryParse(value, out DateTime dt))
+                {
+                    result.Add(dt);
+                }
+            }
+
+            return result.ToArray();
         }
     }
 }

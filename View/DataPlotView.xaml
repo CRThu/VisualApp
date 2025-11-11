@@ -16,6 +16,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <hc:SimpleStackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
@@ -28,7 +29,10 @@
             <TextBlock Text="Y" VerticalAlignment="Center" Width="20" Margin="20,0,0,0"/>
             <hc:ComboBox Width="300" ItemsSource="{Binding DataKeys}" SelectedItem="{Binding SelectedYDataKey}"/>
         </hc:SimpleStackPanel>
-        <sp:WpfPlot Grid.Row="2">
+        <hc:SimpleStackPanel Grid.Row="2" Orientation="Horizontal" Margin="5">
+            <TextBlock Text="{Binding RenderStatusText}" VerticalAlignment="Center" Margin="20,0,0,0"/>
+        </hc:SimpleStackPanel>
+        <sp:WpfPlot Grid.Row="3">
             <i:Interaction.Behaviors>
                 <b:ScottPlotBehavior Plot="{Binding Plot, Mode=OneWayToSource}" IsAutoUpdateEnabled="true"/>
             </i:Interaction.Behaviors>

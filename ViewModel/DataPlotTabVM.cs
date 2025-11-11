@@ -113,7 +113,7 @@ namespace VisualApp.ViewModel
                 double[] ys = GetNumericData(SelectedYDataKey);
                 if (ys == null || ys.Length == 0)
                 {
-                    RenderStatusText = "绘图错误: 数据y轴数据为空";
+                    RenderStatusText = "绘图错误: 数据y轴数据为空或解析失败";
                     return;
                 }
 
@@ -153,11 +153,14 @@ namespace VisualApp.ViewModel
                         {
                             xLabel = SelectedXDataKey;
                         }
+                        else
+                        {
+                            RenderStatusText = "绘图错误: X轴数据解析失败，降级为索引";
+                        }
                     }
                 }
 
                 // 如果 X 轴数据获取失败，降级为索引
-                RenderStatusText = "绘图错误: X轴数据解析失败，降级为数值";
                 if (!useDateTime && (xs == null || xs.Length == 0))
                 {
                     xs = Enumerable.Range(0, ys.Length).Select(i => (double)i).ToArray();
@@ -189,11 +192,14 @@ namespace VisualApp.ViewModel
                 }
 
                 Plot.Axes.Bottom.Label.Text = xLabel;
+                Plot.Axes.Bottom.Label.FontSize = 18;
                 Plot.Axes.Left.Label.Text = SelectedYDataKey;
+                Plot.Axes.Left.Label.FontSize = 18;
                 Plot.Legend.IsVisible = true;
+                Plot.Legend.FontSize = 18;
                 Plot.Axes.AntiAlias(true);
                 Plot.Axes.AutoScale();
-                Plot.ScaleFactor = 1.5;
+                Plot.ScaleFactor = 1.25;
                 Plot.Font.Automatic();
 
                 WeakReferenceMessenger.Default.Send(PlotResetMessage.Instance);
